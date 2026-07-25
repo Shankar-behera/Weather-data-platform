@@ -1,0 +1,9 @@
+dbt.log 
+.env
+virtualenv/
+.env
+dbt_weather/profiles.yml
+dbt_weather/logs/
+dbt_weather/target/
+**/__pycache__/
+*.pyc

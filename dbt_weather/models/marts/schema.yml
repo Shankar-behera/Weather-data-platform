@@ -1,0 +1,784 @@
+version: 2
+
+models:
+  - name: mart_city_weather
+    description: |
+      Comprehensive city-level weather analytics and key performance indicators.
+      This is the primary mart model for city-specific weather analysis.
+    
+    columns:
+      - name: city
+        description: "Name of the city"
+        data_type: VARCHAR
+        tests:
+          - not_null
+          - unique:
+              combination_fields:
+                - city
+                - observation_date
+      
+      - name: observation_date
+        description: "Date of observation"
+        data_type: DATE
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: "2024-01-01"
+              max_value: "2099-12-31"
+      
+      - name: avg_temp
+        description: "Average daily temperature in Celsius"
+        data_type: DOUBLE
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: -50
+              max_value: 60
+      
+      - name: max_temp
+        description: "Maximum daily temperature in Celsius"
+        data_type: DOUBLE
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: -50
+              max_value: 60
+      
+      - name: min_temp
+        description: "Minimum daily temperature in Celsius"
+        data_type: DOUBLE
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: -50
+              max_value: 60
+      
+      - name: avg_humidity
+        description: "Average daily humidity percentage"
+        data_type: DOUBLE
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+      
+      - name: avg_wind_speed
+        description: "Average daily wind speed in km/h"
+        data_type: DOUBLE
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 150
+      
+      - name: hourly_readings
+        description: "Number of hourly readings collected"
+        data_type: INTEGER
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 24
+      
+      - name: most_common_weather
+        description: "Most frequently occurring weather type"
+        data_type: VARCHAR
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Clear', 'Clouds', 'Rain', 'Snow', 'Thunderstorm', 'Drizzle', 'Mist', 'Fog', 'Haze', 'Smoke']
+      
+      - name: temperature_category
+        description: "Categorical classification of daily temperature"
+        data_type: VARCHAR
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Freezing', 'Cold', 'Mild', 'Warm', 'Hot']
+      
+      - name: rolling_24h_avg_temp
+        description: "24-hour rolling average temperature"
+        data_type: DOUBLE
+        tests:
+          - not_null
+      
+      - name: rolling_7d_avg_temp
+        description: "7-day rolling average temperature"
+        data_type: DOUBLE
+        tests:
+          - not_null
+      
+      - name: trend_direction
+        description: "Direction of temperature trend"
+        data_type: VARCHAR
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Rising', 'Falling', 'Stable']
+      
+      - name: temp_vs_7d_avg
+        description: "Difference from 7-day average temperature"
+        data_type: DOUBLE
+        tests:
+          - not_null
+      
+      - name: weather_alert
+        description: "Weather alert status"
+        data_type: VARCHAR
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Normal', 'Heatwave Risk', 'High Heat & Humidity', 'High Wind Alert', 'Heavy Rain Risk', 'Cold Wave Alert']
+      
+      - name: temp_rank_global
+        description: "Global temperature rank among all cities"
+        data_type: INTEGER
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1
+      
+      - name: temp_rank_daily
+        description: "Daily temperature rank among all cities"
+        data_type: INTEGER
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1
+      
+      - name: temp_percentile
+        description: "Temperature percentile (0-1)"
+        data_type: DOUBLE
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 1
+      
+      - name: last_updated
+        description: "Timestamp when the record was last updated"
+        data_type: TIMESTAMP
+        tests:
+          - not_null
+    
+    meta:
+      owner: "shankar"
+      tags: ["weather", "marts", "city", "analytics"]
+      business_owner: "analytics"
+      materialization: "incremental"
+
+  - name: mart_global_weather
+    description: |
+      Global weather analysis providing aggregated metrics across all cities.
+      Used for executive dashboards and global trend analysis.
+    
+    columns:
+      - name: observation_date
+        description: "Date of observation"
+        data_type: DATE
+        tests:
+          - not_null
+          - unique:
+              combination_fields:
+                - observation_date
+      
+      - name: active_cities
+        description: "Number of cities with data for the date"
+        data_type: INTEGER
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+      
+      - name: global_avg_temp
+        description: "Global average temperature across all cities"
+        data_type: DOUBLE
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: -50
+              max_value: 60
+      
+      - name: global_max_temp
+        description: "Global maximum temperature among all cities"
+        data_type: DOUBLE
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: -50
+              max_value: 60
+      
+      - name: global_min_temp
+        description: "Global minimum temperature among all cities"
+        data_type: DOUBLE
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: -50
+              max_value: 60
+      
+      - name: global_avg_humidity
+        description: "Global average humidity across all cities"
+        data_type: DOUBLE
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+      
+      - name: global_avg_wind_speed
+        description: "Global average wind speed across all cities"
+        data_type: DOUBLE
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 150
+      
+      - name: global_most_common_weather
+        description: "Most common weather globally"
+        data_type: VARCHAR
+        tests:
+          - not_null
+      
+      - name: hottest_city
+        description: "City with highest temperature"
+        data_type: VARCHAR
+        tests:
+          - not_null
+      
+      - name: hottest_city_temp
+        description: "Temperature of the hottest city"
+        data_type: DOUBLE
+        tests:
+          - not_null
+      
+      - name: coldest_city
+        description: "City with lowest temperature"
+        data_type: VARCHAR
+        tests:
+          - not_null
+      
+      - name: coldest_city_temp
+        description: "Temperature of the coldest city"
+        data_type: DOUBLE
+        tests:
+          - not_null
+      
+      - name: highest_humidity_city
+        description: "City with highest humidity"
+        data_type: VARCHAR
+        tests:
+          - not_null
+      
+      - name: highest_humidity_value
+        description: "Highest humidity value"
+        data_type: DOUBLE
+        tests:
+          - not_null
+      
+      - name: weather_distribution
+        description: "Distribution of weather types as JSON"
+        data_type: VARCHAR
+        tests:
+          - not_null
+          - dbt_utils.is_json
+      
+      - name: temp_range
+        description: "Range between global max and min temperature"
+        data_type: DOUBLE
+        tests:
+          - not_null
+      
+      - name: avg_temp_rolling_7d
+        description: "7-day rolling average of global temperature"
+        data_type: DOUBLE
+        tests:
+          - not_null
+      
+      - name: extreme_event_count
+        description: "Number of extreme weather events"
+        data_type: INTEGER
+        tests:
+          - not_null
+      
+      - name: last_updated
+        description: "Timestamp when the record was last updated"
+        data_type: TIMESTAMP
+        tests:
+          - not_null
+    
+    meta:
+      owner: "data-engineering"
+      tags: ["weather", "marts", "global", "analytics"]
+      business_owner: "executive"
+      materialization: "incremental"
+
+  - name: weather_daily_summary
+    description: |
+      Daily weather summary by city from the Gold layer.
+      Provides consolidated daily metrics for operational reporting.
+    
+    columns:
+      - name: city
+        description: "City name"
+        data_type: VARCHAR
+        tests:
+          - not_null
+          - unique:
+              combination_fields:
+                - city
+                - observation_date
+      
+      - name: observation_date
+        description: "Date of observation"
+        data_type: DATE
+        tests:
+          - not_null
+      
+      - name: record_count
+        description: "Number of records for the day"
+        data_type: INTEGER
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+      
+      - name: avg_temperature
+        description: "Average daily temperature"
+        data_type: DOUBLE
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: -50
+              max_value: 60
+      
+      - name: max_temperature
+        description: "Maximum daily temperature"
+        data_type: DOUBLE
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: -50
+              max_value: 60
+      
+      - name: min_temperature
+        description: "Minimum daily temperature"
+        data_type: DOUBLE
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: -50
+              max_value: 60
+      
+      - name: avg_humidity
+        description: "Average daily humidity"
+        data_type: DOUBLE
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+      
+      - name: avg_wind_speed
+        description: "Average daily wind speed"
+        data_type: DOUBLE
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 150
+      
+      - name: most_common_weather
+        description: "Most common weather type of the day"
+        data_type: VARCHAR
+        tests:
+          - not_null
+      
+      - name: temp_category
+        description: "Temperature category for the day"
+        data_type: VARCHAR
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Freezing', 'Cold', 'Mild', 'Warm', 'Hot']
+      
+      - name: temperature_range
+        description: "Difference between max and min temperature"
+        data_type: DOUBLE
+        tests:
+          - not_null
+      
+      - name: is_complete_day
+        description: "Whether the day has complete data (24 hours)"
+        data_type: BOOLEAN
+        tests:
+          - accepted_values:
+              values: [true, false]
+      
+      - name: last_updated
+        description: "Timestamp of last update"
+        data_type: TIMESTAMP
+        tests:
+          - not_null
+    
+    meta:
+      owner: "data-engineering"
+      tags: ["weather", "gold", "daily", "operational"]
+      business_owner: "operations"
+      materialization: "incremental"
+
+  - name: weather_trend_analysis
+    description: |
+      Weather trend analysis with rolling windows and change detection.
+      Used for forecasting and trend monitoring.
+    
+    columns:
+      - name: city
+        description: "City name"
+        data_type: VARCHAR
+        tests:
+          - not_null
+          - unique:
+              combination_fields:
+                - city
+                - observation_time
+      
+      - name: observation_time
+        description: "Time of observation"
+        data_type: TIMESTAMP
+        tests:
+          - not_null
+      
+      - name: temperature_celsius
+        description: "Temperature at observation time"
+        data_type: DOUBLE
+        tests:
+          - not_null
+      
+      - name: rolling_24h_avg_temp
+        description: "24-hour rolling average temperature"
+        data_type: DOUBLE
+        tests:
+          - not_null
+      
+      - name: rolling_7d_avg_temp
+        description: "7-day rolling average temperature"
+        data_type: DOUBLE
+        tests:
+          - not_null
+      
+      - name: rolling_24h_min_temp
+        description: "24-hour rolling minimum temperature"
+        data_type: DOUBLE
+      
+      - name: rolling_24h_max_temp
+        description: "24-hour rolling maximum temperature"
+        data_type: DOUBLE
+      
+      - name: temp_change_24h
+        description: "24-hour temperature change"
+        data_type: DOUBLE
+        tests:
+          - not_null
+      
+      - name: temp_change_pct
+        description: "24-hour temperature change percentage"
+        data_type: DOUBLE
+        tests:
+          - not_null
+      
+      - name: trend_direction
+        description: "Direction of temperature trend"
+        data_type: VARCHAR
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Rising', 'Falling', 'Stable']
+      
+      - name: trend_strength
+        description: "Strength of the trend (0-1)"
+        data_type: DOUBLE
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 1
+      
+      - name: volatility_score
+        description: "Weather volatility score (0-100)"
+        data_type: DOUBLE
+        tests:
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+      
+      - name: last_updated
+        description: "Timestamp of last update"
+        data_type: TIMESTAMP
+        tests:
+          - not_null
+    
+    meta:
+      owner: "data-science"
+      tags: ["weather", "gold", "trend", "forecast"]
+      business_owner: "analytics"
+      materialization: "incremental"
+
+  - name: extreme_weather_events
+    description: |
+      Detection and tracking of extreme weather events.
+      Used for alerting and risk management.
+    
+    columns:
+      - name: city
+        description: "City name"
+        data_type: VARCHAR
+        tests:
+          - not_null
+      
+      - name: observation_time
+        description: "Time of observation"
+        data_type: TIMESTAMP
+        tests:
+          - not_null
+      
+      - name: temperature_celsius
+        description: "Temperature during event"
+        data_type: DOUBLE
+        tests:
+          - not_null
+      
+      - name: wind_speed
+        description: "Wind speed during event"
+        data_type: DOUBLE
+        tests:
+          - not_null
+      
+      - name: weather_main
+        description: "Weather type during event"
+        data_type: VARCHAR
+        tests:
+          - not_null
+      
+      - name: weather_description
+        description: "Detailed weather description"
+        data_type: VARCHAR
+        tests:
+          - not_null
+      
+      - name: event_type
+        description: "Type of extreme event"
+        data_type: VARCHAR
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Heatwave', 'Storm', 'Heavy Rain', 'Cold Wave', 'Snowstorm', 'Hailstorm', 'Tornado']
+      
+      - name: event_severity
+        description: "Severity of the event"
+        data_type: VARCHAR
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Low', 'Medium', 'High', 'Extreme']
+      
+      - name: event_duration_minutes
+        description: "Duration of event in minutes"
+        data_type: INTEGER
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+      
+      - name: affected_radius_km
+        description: "Affected radius in kilometers"
+        data_type: DOUBLE
+      
+      - name: detection_time
+        description: "Time event was detected"
+        data_type: TIMESTAMP
+        tests:
+          - not_null
+      
+      - name: is_alert_sent
+        description: "Whether an alert was sent"
+        data_type: BOOLEAN
+        tests:
+          - accepted_values:
+              values: [true, false]
+      
+      - name: alert_sent_time
+        description: "Time alert was sent"
+        data_type: TIMESTAMP
+    
+    meta:
+      owner: "data-engineering"
+      tags: ["weather", "gold", "extreme", "alerts"]
+      business_owner: "operations"
+      materialization: "incremental"
+
+  - name: mart_weather_quality
+    description: |
+      Mart model for weather data quality metrics and monitoring.
+      Used for data governance and quality assurance.
+    
+    columns:
+      - name: city
+        description: "City name"
+        data_type: VARCHAR
+        tests:
+          - not_null
+      
+      - name: date
+        description: "Date of quality assessment"
+        data_type: DATE
+        tests:
+          - not_null
+      
+      - name: total_readings
+        description: "Total readings for the day"
+        data_type: INTEGER
+        tests:
+          - not_null
+      
+      - name: valid_readings
+        description: "Number of valid readings"
+        data_type: INTEGER
+        tests:
+          - not_null
+      
+      - name: invalid_readings
+        description: "Number of invalid readings"
+        data_type: INTEGER
+        tests:
+          - not_null
+      
+      - name: quality_score
+        description: "Overall quality score (0-100)"
+        data_type: DOUBLE
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+      
+      - name: data_completeness
+        description: "Data completeness percentage"
+        data_type: DOUBLE
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+      
+      - name: freshness_hours
+        description: "Hours since last update"
+        data_type: DOUBLE
+        tests:
+          - not_null
+      
+      - name: quality_status
+        description: "Overall quality status"
+        data_type: VARCHAR
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Excellent', 'Good', 'Fair', 'Poor', 'Critical']
+      
+      - name: issues_detected
+        description: "Number of quality issues detected"
+        data_type: INTEGER
+        tests:
+          - not_null
+      
+      - name: last_checked
+        description: "Timestamp of last quality check"
+        data_type: TIMESTAMP
+        tests:
+          - not_null
+    
+    meta:
+      owner: "data-engineering"
+      tags: ["weather", "marts", "quality", "governance"]
+      business_owner: "data-governance"
+      materialization: "table"
+
+  - name: mart_weather_forecast_accuracy
+    description: |
+      Mart model tracking forecast accuracy and model performance.
+      Used for improving forecasting models.
+    
+    columns:
+      - name: city
+        description: "City name"
+        data_type: VARCHAR
+        tests:
+          - not_null
+      
+      - name: forecast_date
+        description: "Date of forecast"
+        data_type: DATE
+        tests:
+          - not_null
+      
+      - name: forecast_horizon_hours
+        description: "Forecast horizon in hours"
+        data_type: INTEGER
+        tests:
+          - not_null
+      
+      - name: predicted_temp
+        description: "Predicted temperature"
+        data_type: DOUBLE
+        tests:
+          - not_null
+      
+      - name: actual_temp
+        description: "Actual temperature"
+        data_type: DOUBLE
+        tests:
+          - not_null
+      
+      - name: absolute_error
+        description: "Absolute forecast error"
+        data_type: DOUBLE
+        tests:
+          - not_null
+      
+      - name: percentage_error
+        description: "Percentage forecast error"
+        data_type: DOUBLE
+        tests:
+          - not_null
+      
+      - name: accuracy_score
+        description: "Accuracy score (0-100)"
+        data_type: DOUBLE
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+      
+      - name: model_version
+        description: "Forecast model version"
+        data_type: VARCHAR
+      
+      - name: is_accurate
+        description: "Whether forecast was accurate"
+        data_type: BOOLEAN
+        tests:
+          - accepted_values:
+              values: [true, false]
+      
+      - name: last_updated
+        description: "Timestamp of last update"
+        data_type: TIMESTAMP
+        tests:
+          - not_null
+
+    meta:
+      owner: "data-science"
+      tags: ["weather", "marts", "forecast", "accuracy"]
+      business_owner: "analytics"
+      materialization: "table"

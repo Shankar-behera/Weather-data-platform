@@ -1,0 +1,29 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements
+COPY requirements.txt .
+COPY monitoring/ /app/monitoring/
+COPY ingestion/ /app/ingestion/
+
+# Install Python dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Install project
+RUN pip install -e .
+
+# Set environment variables
+ENV PYTHONPATH=/app
+ENV PYTHONUNBUFFERED=1
+
+# Create necessary directories
+RUN mkdir -p /app/monitoring/logs
+
+# Run monitoring
+CMD ["python", "-m", "monitoring.quality_checks"]

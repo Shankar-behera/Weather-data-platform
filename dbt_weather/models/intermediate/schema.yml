@@ -1,0 +1,142 @@
+﻿version: 2
+
+models:
+  - name: int_weather_metrics
+    description: "Intermediate model for weather metrics and calculations"
+    columns:
+      - name: city
+        description: "City name"
+        tests:
+          - not_null
+      - name: observation_date
+        description: "Date of observation (truncated from timestamp)"
+        tests:
+          - not_null
+      - name: hourly_readings
+        description: "Number of hourly readings for the day"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 1
+      - name: avg_temp
+        description: "Average temperature for the day in Celsius"
+        tests:
+          - not_null
+      - name: max_temp
+        description: "Maximum temperature for the day in Celsius"
+        tests:
+          - not_null
+      - name: min_temp
+        description: "Minimum temperature for the day in Celsius"
+        tests:
+          - not_null
+      - name: avg_humidity
+        description: "Average humidity for the day"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 100
+      - name: avg_wind_speed
+        description: "Average wind speed for the day in km/h"
+        tests:
+          - not_null
+      - name: most_common_weather
+        description: "Most frequently occurring weather type"
+        tests:
+          - not_null
+      - name: temperature_category
+        description: "Temperature category (Freezing, Cold, Mild, Warm, Hot)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Freezing', 'Cold', 'Mild', 'Warm', 'Hot']
+      - name: rolling_24h_avg_temp
+        description: "24-hour rolling average temperature"
+        tests:
+          - not_null
+      - name: rolling_7d_avg_temp
+        description: "7-day rolling average temperature"
+        tests:
+          - not_null
+      - name: trend_direction
+        description: "Temperature trend direction (Rising, Falling, Stable)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Rising', 'Falling', 'Stable']
+      - name: last_updated
+        description: "Last time the record was updated"
+        tests:
+          - not_null
+
+  - name: int_weather_forecast
+    description: "Weather forecast calculations"
+    columns:
+      - name: city
+        tests:
+          - not_null
+      - name: observation_time
+        tests:
+          - not_null
+      - name: temperature_celsius
+        tests:
+          - not_null
+      - name: created_at
+        tests:
+          - not_null
+
+  - name: int_weather_anomalies
+    description: "Weather anomaly detection"
+    columns:
+      - name: city
+        tests:
+          - not_null
+      - name: observation_time
+        tests:
+          - not_null
+      - name: temperature_celsius
+        tests:
+          - not_null
+      - name: created_at
+        tests:
+          - not_null
+
+  - name: int_weather_station_metrics
+    description: "Weather station performance metrics"
+    columns:
+      - name: city
+        tests:
+          - not_null
+      - name: observation_time
+        tests:
+          - not_null
+      - name: created_at
+        tests:
+          - not_null
+
+  - name: int_climate_patterns
+    description: "Climate patterns analysis"
+    columns:
+      - name: city
+        tests:
+          - not_null
+      - name: observation_time
+        tests:
+          - not_null
+      - name: created_at
+        tests:
+          - not_null
+
+  - name: int_weather_correlation
+    description: "Weather variable correlations"
+    columns:
+      - name: city
+        tests:
+          - not_null
+      - name: observation_time
+        tests:
+          - not_null
+      - name: created_at
+        tests:
+          - not_null

@@ -1,0 +1,50 @@
+﻿version: 2
+
+sources:
+  - name: weather
+    description: 'Weather data from OpenWeatherMap'
+    database: weather
+    schema: weather
+    tables:
+      - name: weather_gold
+        description: 'Gold layer weather data'
+        columns:
+          - name: city
+            description: 'City name'
+          - name: observation_time
+            description: 'Time of observation'
+          - name: temperature_celsius
+            description: 'Temperature in Celsius'
+          - name: humidity
+            description: 'Humidity percentage'
+          - name: pressure
+            description: 'Atmospheric pressure'
+          - name: wind_speed
+            description: 'Wind speed in km/h'
+          - name: weather_main
+            description: 'Main weather condition'
+          - name: weather_description
+            description: 'Detailed weather description'
+          - name: is_valid
+            description: 'Whether the record passed quality checks'
+      - name: weather_silver
+        description: 'Silver layer weather data'
+        columns:
+          - name: city
+            description: 'City name'
+          - name: observation_time
+            description: 'Time of observation'
+          - name: temperature_celsius
+            description: 'Temperature in Celsius'
+          - name: humidity
+            description: 'Humidity percentage'
+          - name: pressure
+            description: 'Atmospheric pressure'
+          - name: wind_speed
+            description: 'Wind speed in km/h'
+          - name: weather_main
+            description: 'Main weather condition'
+          - name: weather_description
+            description: 'Detailed weather description'
+          - name: is_valid
+            description: 'Whether the record passed quality checks'

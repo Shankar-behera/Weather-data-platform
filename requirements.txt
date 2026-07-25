@@ -1,0 +1,206 @@
+# ============================================
+# Core Dependencies
+# ============================================
+requests>=2.31.0
+pydantic>=2.5.0
+pydantic-settings>=2.1.0
+pydantic[email]>=2.5.0
+tenacity>=8.2.3
+python-dotenv>=1.0.0
+python-dateutil>=2.8.2
+click>=8.1.0
+
+# ============================================
+# Databricks & Spark
+# ============================================
+databricks-sql-connector>=2.9.0
+pyspark>=3.5.0
+delta-spark>=3.0.0
+delta-rs>=0.10.0
+
+# ============================================
+# dbt
+# ============================================
+dbt-core>=1.7.0
+dbt-duckdb>=1.7.0
+dbt-databricks>=1.7.0
+
+# ============================================
+# Analytics & Data Processing
+# ============================================
+duckdb>=0.10.0
+pandas>=2.1.0
+numpy>=1.26.0
+pyarrow>=14.0.0
+sqlalchemy>=2.0.0
+psycopg2-binary>=2.9.9
+
+# ============================================
+# Dashboard & Visualization
+# ============================================
+streamlit>=1.29.0
+plotly>=5.18.0
+plotly-express>=0.4.1
+altair>=5.2.0
+st-aggrid>=1.0.0
+streamlit-aggrid>=0.3.4
+streamlit-extras>=0.3.0
+
+# ============================================
+# Data Quality & Testing
+# ============================================
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-xdist>=3.3.0
+pytest-mock>=3.11.0
+great-expectations>=0.18.0
+pandera>=0.18.0
+marshmallow>=3.20.0
+
+# ============================================
+# Code Quality & Linting
+# ============================================
+black>=23.12.1
+ruff>=0.1.13
+pre-commit>=3.6.0
+mypy>=1.8.0
+isort>=5.13.2
+pylint>=3.0.0
+flake8>=7.0.0
+bandit>=1.7.5
+safety>=2.3.5
+
+# ============================================
+# Monitoring & Logging
+# ============================================
+jinja2>=3.1.0
+loguru>=0.7.2
+python-json-logger>=2.0.7
+prometheus-client>=0.19.0
+structlog>=24.1.0
+elasticsearch>=8.11.0
+
+# ============================================
+# Infrastructure & Cloud
+# ============================================
+boto3>=1.34.0
+botocore>=1.34.0
+s3fs>=2023.12.0
+pyyaml>=6.0.1
+toml>=0.10.2
+json5>=0.9.14
+
+# ============================================
+# Utility & Development
+# ============================================
+typing-extensions>=4.9.0
+attrs>=23.2.0
+dataclasses-json>=0.6.1
+python-multipart>=0.0.6
+email-validator>=2.1.0
+httpx>=0.25.0
+aiohttp>=3.9.0
+asyncio>=3.4.3
+
+# ============================================
+# Email & Notifications
+# ============================================
+smtplib>=0.0.1
+sendgrid>=6.10.0
+
+# ============================================
+# Security
+# ============================================
+cryptography>=41.0.7
+python-jose>=3.3.0
+passlib>=1.7.4
+bcrypt>=4.1.0
+
+# ============================================
+# Documentation
+# ============================================
+mkdocs>=1.5.3
+mkdocs-material>=9.5.0
+mkdocstrings>=0.24.0
+sphinx>=7.2.0
+sphinx-rtd-theme>=2.0.0
+
+# ============================================
+# Performance & Profiling
+# ============================================
+memory-profiler>=0.61.0
+line-profiler>=4.1.0
+py-spy>=0.3.14
+
+# ============================================
+# Additional Utilities
+# ============================================
+cachetools>=5.3.0
+redis>=5.0.1
+celery>=5.3.0
+schedule>=1.2.0
+"""
+
+## requirements-dev.txt (Development Dependencies)
+# ============================================
+# Development Dependencies
+# ============================================
+
+# Testing & Quality
+pytest>=7.4.0
+pytest-cov>=4.1.0
+pytest-xdist>=3.3.0
+pytest-mock>=3.11.0
+pytest-timeout>=2.1.0
+pytest-benchmark>=4.0.0
+coverage>=7.4.0
+tox>=4.11.0
+
+# Code Quality
+black>=23.12.1
+ruff>=0.1.13
+pre-commit>=3.6.0
+mypy>=1.8.0
+isort>=5.13.2
+pylint>=3.0.0
+flake8>=7.0.0
+bandit>=1.7.5
+safety>=2.3.5
+autopep8>=2.0.0
+
+# Documentation
+mkdocs>=1.5.3
+mkdocs-material>=9.5.0
+mkdocstrings>=0.24.0
+pydoc-markdown>=4.8.0
+sphinx>=7.2.0
+sphinx-rtd-theme>=2.0.0
+m2r2>=0.3.3
+
+# Profiling & Debugging
+memory-profiler>=0.61.0
+line-profiler>=4.1.0
+py-spy>=0.3.14
+icecream>=2.1.3
+ipdb>=0.13.13
+ipython>=8.18.0
+pdbpp>=0.10.3
+
+# Development Tools
+pip-tools>=7.3.0
+watchdog>=3.0.0
+twine>=4.0.0
+build>=1.0.0
+wheel>=0.42.0
+setuptools>=68.0.0
+
+# Containerization
+docker>=6.1.0
+docker-compose>=1.29.0
+
+# Environment Management
+python-dotenv>=1.0.0
+virtualenv>=20.25.0
+
+```
+"""

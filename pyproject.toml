@@ -1,0 +1,122 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "weather-data-platform"
+version = "1.0.0"
+description = "End-to-end weather data engineering platform"
+authors = [
+    {name = "Your Name", email = "your.email@example.com"},
+]
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "requests>=2.31.0",
+    "pydantic>=2.5.0",
+    "pydantic-settings>=2.1.0",
+    "tenacity>=8.2.3",
+    "databricks-sql-connector>=2.9.0",
+    "pyspark>=3.5.0",
+    "delta-spark>=3.0.0",
+    "duckdb>=0.10.0",
+    "dbt-core>=1.7.0",
+    "dbt-duckdb>=1.7.0",
+    "streamlit>=1.29.0",
+    "plotly>=5.18.0",
+    "pandas>=2.1.0",
+    "numpy>=1.26.0",
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.12.1",
+    "ruff>=0.1.13",
+    "pre-commit>=3.6.0",
+    "mypy>=1.8.0",
+    "isort>=5.13.2",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4.0",
+    "pytest-cov>=4.1.0",
+    "black>=23.12.1",
+    "ruff>=0.1.13",
+    "pre-commit>=3.6.0",
+    "mypy>=1.8.0",
+    "isort>=5.13.2",
+]
+
+[tool.black]
+line-length = 120
+target-version = ['py312']
+include = '\.pyi?$'
+extend-exclude = '''
+/(
+    \.eggs
+  | \.git
+  | \.hg
+  | \.mypy_cache
+  | \.tox
+  | \.venv
+  | _build
+  | buck-out
+  | build
+  | dist
+)/
+'''
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+select = [
+    "E",  # pycodestyle errors
+    "W",  # pycodestyle warnings
+    "F",  # pyflakes
+    "I",  # isort
+    "C",  # mccabe
+    "B",  # flake8-bugbear
+    "UP", # pyupgrade
+    "RUF",# ruff specific
+]
+ignore = [
+    "E501", # line too long, handled by black
+    "B008", # do not perform function calls in argument defaults
+]
+
+[tool.ruff.isort]
+known-first-party = ["ingestion", "duckdb", "streamlit_app"]
+
+[tool.ruff.per-file-ignores]
+"__init__.py" = ["F401"]
+"tests/**/*.py" = ["B011"]
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+ignore_missing_imports = true
+disallow_untyped_defs = true
+disallow_any_unimported = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+warn_unreachable = true
+
+[tool.pytest.ini_options]
+minversion = "7.0"
+addopts = "-ra -q --cov=ingestion --cov=duckdb --cov-report=html --cov-report=xml"
+testpaths = [
+    "tests/unit",
+    "tests/integration",
+]
+python_files = "test_*.py"
+python_functions = "test_*"
+
+[tool.isort]
+profile = "black"
+line_length = 120
+force_sort_within_sections = true
+known_first_party = ["ingestion", "duckdb", "streamlit_app"]
+known_third_party = ["pytest", "pydantic", "requests"]
+sections = ["FUTURE", "STDLIB", "THIRDPARTY", "FIRSTPARTY", "LOCALFOLDER"]

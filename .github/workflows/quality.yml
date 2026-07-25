@@ -1,0 +1,158 @@
+name: Code Quality
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+  schedule:
+    # Run daily at 6 AM
+    - cron: '0 6 * * *'
+
+env:
+  PYTHON_VERSION: '3.12'
+
+jobs:
+  lint:
+    name: Lint and Format
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Install dependencies
+        run: |
+          pip install ruff black pre-commit mypy isort
+      
+      - name: Run Ruff
+        run: ruff check . --output-format=github
+      
+      - name: Run Black
+        run: black --check --diff .
+      
+      - name: Run isort
+        run: isort --check-only --diff .
+      
+      - name: Run mypy
+        run: mypy ingestion/ duckdb/ streamlit_app/
+        continue-on-error: true
+      
+      - name: Run pre-commit
+        run: pre-commit run --all-files
+        continue-on-error: true
+
+  test:
+    name: Run Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install pytest pytest-cov
+      
+      - name: Run unit tests
+        run: |
+          pytest tests/unit/ -v --cov=ingestion --cov=duckdb --cov-report=xml --cov-report=html
+      
+      - name: Upload test coverage
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          flags: unittests
+          fail_ci_if_error: false
+      
+      - name: Upload test reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-reports
+          path: htmlcov/
+
+  quality-checks:
+    name: Data Quality Checks
+    runs-on: ubuntu-latest
+    needs: test
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+      
+      - name: Run data quality checks
+        run: |
+          python -m monitoring.quality_checks
+        env:
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+          DATABRICKS_CATALOG: ${{ secrets.DATABRICKS_CATALOG }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+      
+      - name: Upload quality reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-reports
+          path: monitoring/logs/quality_*.json
+      
+      - name: Notify on quality issues
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const message = `⚠️ Data Quality Checks Failed!\n\nWorkflow: ${context.workflow}\nRun: ${context.runId}\nRepository: ${context.repo}\n\nCheck quality reports for details.`;
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `[${new Date().toISOString()}] Data Quality Issues Detected`,
+              body: message,
+              labels: ['quality', 'data-quality']
+            });
+
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: lint
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+      
+      - name: Upload Trivy results to GitHub Security
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'
+      
+      - name: Check for secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

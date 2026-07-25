@@ -1,0 +1,65 @@
+﻿version: 2
+
+models:
+  - name: stg_weather
+    description: "Staging model for raw weather data from Silver layer"
+    columns:
+      - name: city
+        description: "City name"
+        tests:
+          - not_null
+          - unique:
+              combination_fields:
+                - city
+                - observation_time
+      - name: temperature_celsius
+        description: "Temperature in Celsius"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [-50, -40, -30, -20, -10, 0, 10, 20, 30, 40, 50, 60]
+              quote: false
+      - name: humidity
+        description: "Humidity percentage (0-100)"
+        tests:
+          - not_null
+          - accepted_values:
+              values: [0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+              quote: false
+      - name: pressure
+        description: "Atmospheric pressure in hPa"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 800
+              max_value: 1100
+      - name: wind_speed
+        description: "Wind speed in km/h"
+        tests:
+          - not_null
+          - dbt_utils.accepted_range:
+              min_value: 0
+              max_value: 150
+      - name: weather_main
+        description: "Main weather category"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['Clear', 'Clouds', 'Rain', 'Snow', 'Thunderstorm', 'Drizzle', 'Mist', 'Fog']
+      - name: weather_description
+        description: "Detailed weather description"
+        tests:
+          - not_null
+      - name: observation_time
+        description: "Time of observation in UTC"
+        tests:
+          - not_null
+      - name: ingestion_id
+        description: "Unique identifier for ingestion"
+        tests:
+          - not_null
+          - unique
+      - name: processed_time
+        description: "Time record was processed"
+        tests:
+          - not_null

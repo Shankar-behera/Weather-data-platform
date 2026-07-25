@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  etl:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.etl
+    environment:
+      - OPENWEATHER_API_KEY=${OPENWEATHER_API_KEY}
+      - DATABRICKS_HOST=${DATABRICKS_HOST}
+      - DATABRICKS_TOKEN=${DATABRICKS_TOKEN}
+      - DATABRICKS_CATALOG=${DATABRICKS_CATALOG:-weather}
+      - LOG_LEVEL=${LOG_LEVEL:-INFO}
+      - LOG_FORMAT=${LOG_FORMAT:-json}
+    volumes:
+      - ../ingestion:/app/ingestion
+      - ../monitoring/logs:/app/monitoring/logs
+      - ../.env:/app/.env
+    networks:
+      - weather-network
+    restart: unless-stopped
+
+  dbt:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.dbt
+    depends_on:
+      - etl
+    volumes:
+      - ../dbt_weather:/app/dbt_weather
+      - ../duckdb:/app/duckdb
+      - ../monitoring/logs:/app/monitoring/logs
+    networks:
+      - weather-network
+    restart: unless-stopped
+
+  streamlit:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.streamlit
+    ports:
+      - "8501:8501"
+    environment:
+      - DUCKDB_PATH=/app/duckdb/analytics.duckdb
+    volumes:
+      - ../streamlit_app:/app/streamlit_app
+      - ../duckdb:/app/duckdb
+    networks:
+      - weather-network
+    restart: unless-stopped
+
+  monitoring:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile.monitoring
+    depends_on:
+      - etl
+    environment:
+      - DATABRICKS_HOST=${DATABRICKS_HOST}
+      - DATABRICKS_TOKEN=${DATABRICKS_TOKEN}
+      - DATABRICKS_CATALOG=${DATABRICKS_CATALOG:-weather}
+      - SLACK_WEBHOOK_URL=${SLACK_WEBHOOK_URL:-}
+      - EMAIL_SENDER=${EMAIL_SENDER:-}
+      - EMAIL_PASSWORD=${EMAIL_PASSWORD:-}
+      - EMAIL_RECIPIENTS=${EMAIL_RECIPIENTS:-}
+    volumes:
+      - ../monitoring:/app/monitoring
+      - ../monitoring/logs:/app/monitoring/logs
+    networks:
+      - weather-network
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_DB=weather_metadata
+      - POSTGRES_USER=weather_admin
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD:-weather_password}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - weather-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  weather-network:
+    driver: bridge

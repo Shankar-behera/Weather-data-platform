@@ -1,0 +1,61 @@
+name: Weather Data Ingestion
+
+on:
+  schedule:
+    # Run every hour
+    - cron: '0 * * * *'
+  workflow_dispatch:
+    # Allow manual trigger
+
+env:
+  PYTHON_VERSION: '3.12'
+  POETRY_VERSION: '1.7.1'
+
+jobs:
+  ingest:
+    name: Ingest Weather Data
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
+        with:
+          version: ${{ env.POETRY_VERSION }}
+          virtualenvs-create: true
+          virtualenvs-in-project: true
+      
+      - name: Cache dependencies
+        uses: actions/cache@v3
+        id: cache
+        with:
+          path: .venv
+          key: venv-${{ runner.os }}-${{ hashFiles('**/poetry.lock') }}
+      
+      - name: Install dependencies
+        run: poetry install --no-interaction --no-root
+        if: steps.cache.outputs.cache-hit != 'true'
+      
+      - name: Install project
+        run: poetry install --no-interaction
+      
+      - name: Run ingestion
+        run: poetry run python -m ingestion.main
+        env:
+          OPENWEATHER_API_KEY: ${{ secrets.OPENWEATHER_API_KEY }}
+          DATABRICKS_HOST: ${{ secrets.DATABRICKS_HOST }}
+          DATABRICKS_TOKEN: ${{ secrets.DATABRICKS_TOKEN }}
+      
+      - name: Upload logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ingestion-logs
+          path: monitoring/logs/

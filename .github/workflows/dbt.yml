@@ -1,0 +1,103 @@
+name: dbt Transformations
+
+on:
+  workflow_run:
+    workflows: ["Weather Data Ingestion"]
+    types:
+      - completed
+  workflow_dispatch:
+
+jobs:
+  run-dbt:
+    name: Run dbt Models
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' || github.event_name == 'workflow_dispatch' }}
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      
+      - name: Install dbt
+        run: |
+          pip install dbt-duckdb==1.7.0
+          pip install dbt-core==1.7.0
+      
+      - name: Create profiles.yml
+        run: |
+          mkdir -p ~/.dbt
+          cat > ~/.dbt/profiles.yml << EOL
+          weather_analytics:
+            target: ci
+            outputs:
+              ci:
+                type: duckdb
+                path: duckdb/analytics.duckdb
+                schema: weather
+                threads: 4
+          EOL
+      
+      - name: Install dbt packages
+        run: |
+          cd dbt_weather
+          dbt deps
+      
+      - name: Run dbt seed
+        run: |
+          cd dbt_weather
+          dbt seed
+      
+      - name: Run dbt build
+        run: |
+          cd dbt_weather
+          dbt build --profiles-dir ~/.dbt
+      
+      - name: Run dbt tests
+        run: |
+          cd dbt_weather
+          dbt test --profiles-dir ~/.dbt
+      
+      - name: Generate dbt docs
+        run: |
+          cd dbt_weather
+          dbt docs generate --profiles-dir ~/.dbt
+      
+      - name: Upload dbt artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dbt-artifacts
+          path: dbt_weather/target/
+      
+      - name: Upload dbt logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dbt-logs
+          path: dbt_weather/logs/
+      
+      - name: Deploy dbt docs to GitHub Pages
+        if: success()
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dbt_weather/target
+          destination_dir: docs
+          keep_files: false
+      
+      - name: Notify on failure
+        if: failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const message = `🚨 dbt Transformations Failed!\n\nWorkflow: ${context.workflow}\nRun: ${context.runId}\nRepository: ${context.repo}\n\nCheck logs for details.`;
+            github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `[${new Date().toISOString()}] dbt Transformations Failed`,
+              body: message,
+              labels: ['incident', 'dbt']
+            });

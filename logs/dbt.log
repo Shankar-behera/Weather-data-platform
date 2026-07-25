@@ -1,0 +1,46 @@
+[0m23:08:10.768536 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000198F5B3A8D0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000198F5AF2110>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000198F5AF0BD0>]}
+
+
+============================== 23:08:10.783491 | 58a12ada-e3a9-4e96-ab65-ebbc3ad4e593 ==============================
+[0m23:08:10.783491 [info ] [MainThread]: Running with dbt=1.11.11
+[0m23:08:10.786719 [debug] [MainThread]: running dbt with arguments {'version_check': 'True', 'no_print': 'None', 'static_parser': 'True', 'target_path': 'None', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'printer_width': '80', 'write_json': 'True', 'introspect': 'True', 'log_cache_events': 'False', 'empty': 'None', 'cache_selected_only': 'False', 'fail_fast': 'False', 'debug': 'False', 'log_format': 'default', 'partial_parse': 'True', 'send_anonymous_usage_stats': 'True', 'quiet': 'False', 'warn_error': 'None', 'profiles_dir': 'C:\\Users\\Shank\\.dbt', 'invocation_command': 'dbt debug', 'indirect_selection': 'eager', 'use_colors': 'True', 'use_experimental_parser': 'False', 'log_path': 'logs'}
+[0m23:08:10.873558 [info ] [MainThread]: dbt version: 1.11.11
+[0m23:08:10.875392 [info ] [MainThread]: python version: 3.11.7
+[0m23:08:10.877415 [info ] [MainThread]: python path: C:\Users\Shank\anaconda3\python.exe
+[0m23:08:10.879452 [info ] [MainThread]: os info: Windows-10-10.0.26200-SP0
+[0m23:08:14.517810 [debug] [MainThread]: Spark adapter: Setting pyhive.hive logging to ERROR
+[0m23:08:14.520342 [debug] [MainThread]: Spark adapter: Setting thrift.transport logging to ERROR
+[0m23:08:14.521321 [debug] [MainThread]: Spark adapter: Setting thrift.protocol logging to ERROR
+[0m23:08:18.885011 [info ] [MainThread]: Using profiles dir at C:\Users\Shank\.dbt
+[0m23:08:18.887013 [info ] [MainThread]: Using profiles.yml file at C:\Users\Shank\.dbt\profiles.yml
+[0m23:08:18.890019 [info ] [MainThread]: Using dbt_project.yml file at C:\Users\Shank\PROJECT-CS\data engineering\weather-data-platform\dbt_project.yml
+[0m23:08:18.892162 [error] [MainThread]: Encountered an error:
+Internal Error
+  Profile should not be None if loading profile completed
+[0m23:08:18.896645 [debug] [MainThread]: Command `dbt debug` failed at 23:08:18.895645 after 8.51 seconds
+[0m23:08:18.898669 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000198F5AAA5D0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000198EEFF6310>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x00000198EEFF64D0>]}
+[0m23:08:18.900623 [debug] [MainThread]: Flushing usage events
+[0m23:08:21.437970 [debug] [MainThread]: An error was encountered while trying to flush usage events
+[0m23:40:37.150017 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001F1348DB390>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001F134922750>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001F134969190>]}
+
+
+============================== 23:40:37.162426 | d2a41b84-8d35-4ad9-84f9-ebcdbe1e9ff6 ==============================
+[0m23:40:37.162426 [info ] [MainThread]: Running with dbt=1.11.11
+[0m23:40:37.164823 [debug] [MainThread]: running dbt with arguments {'static_parser': 'True', 'no_print': 'None', 'version_check': 'True', 'target_path': 'None', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])', 'printer_width': '80', 'write_json': 'True', 'introspect': 'True', 'log_cache_events': 'False', 'empty': 'None', 'cache_selected_only': 'False', 'log_format': 'default', 'debug': 'False', 'fail_fast': 'False', 'partial_parse': 'True', 'send_anonymous_usage_stats': 'True', 'quiet': 'False', 'warn_error': 'None', 'profiles_dir': 'C:\\Users\\Shank\\.dbt', 'invocation_command': 'dbt debug', 'indirect_selection': 'eager', 'use_colors': 'True', 'use_experimental_parser': 'False', 'log_path': 'logs'}
+[0m23:40:37.230511 [info ] [MainThread]: dbt version: 1.11.11
+[0m23:40:37.232871 [info ] [MainThread]: python version: 3.11.7
+[0m23:40:37.235005 [info ] [MainThread]: python path: C:\Users\Shank\anaconda3\python.exe
+[0m23:40:37.236987 [info ] [MainThread]: os info: Windows-10-10.0.26200-SP0
+[0m23:40:40.208079 [debug] [MainThread]: Spark adapter: Setting pyhive.hive logging to ERROR
+[0m23:40:40.210287 [debug] [MainThread]: Spark adapter: Setting thrift.transport logging to ERROR
+[0m23:40:40.211316 [debug] [MainThread]: Spark adapter: Setting thrift.protocol logging to ERROR
+[0m23:40:43.647812 [info ] [MainThread]: Using profiles dir at C:\Users\Shank\.dbt
+[0m23:40:43.649834 [info ] [MainThread]: Using profiles.yml file at C:\Users\Shank\.dbt\profiles.yml
+[0m23:40:43.650816 [info ] [MainThread]: Using dbt_project.yml file at C:\Users\Shank\PROJECT-CS\data engineering\weather-data-platform\dbt_project.yml
+[0m23:40:43.651834 [error] [MainThread]: Encountered an error:
+Internal Error
+  Profile should not be None if loading profile completed
+[0m23:40:43.657756 [debug] [MainThread]: Command `dbt debug` failed at 23:40:43.656540 after 6.83 seconds
+[0m23:40:43.659925 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001F1348DAB90>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001F1359DA390>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x000001F12DDD6650>]}
+[0m23:40:43.660923 [debug] [MainThread]: Flushing usage events
+[0m23:40:46.469121 [debug] [MainThread]: An error was encountered while trying to flush usage events
